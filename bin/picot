@@ -5,6 +5,6 @@ import picot.feed
 
 feed = picot.feed.Feed(sys.argv[1])
 
-print(feed)
+print('{} ({} entries)'.format(feed, len(feed)))
 for entry in feed:
     print(entry['title'])

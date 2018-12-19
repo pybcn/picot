@@ -7,6 +7,9 @@ class Feed(object):
     def __iter__(self):
         return iter(self._feed.entries)
 
+    def __len__(self):
+        return len(self._feed.entries)
+
     def __repr__(self):
         return "{} ({})".format(
             self._feed.feed.title,
