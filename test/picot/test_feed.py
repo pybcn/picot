@@ -18,23 +18,26 @@ class MockFeed(object):
         self.feed.link = url
         self.feed.title = 'Feed at {}'.format(url)
 
+single_entry = [
+    {
+        'title': 'Some entry',
+    },
+]
+multiple_entries = [
+    {
+        'title': 'Some entry',
+    },
+    {
+        'title': 'Some other entry',
+    },
+]
+
 @pytest.mark.parametrize(
     'expected_entries',
     [
         ([]),
-        ([
-            {
-                'title': 'Some entry',
-            },
-        ]),
-        ([
-            {
-                'title': 'Some entry',
-            },
-            {
-                'title': 'Some other entry',
-            },
-        ]),
+        (single_entry),
+        (multiple_entries),
     ],
     ids=[
         'No entries',
@@ -59,3 +62,43 @@ def test_feed(expected_entries, monkeypatch):
                 if entry[key] == expected_entry[key]:
                     assert(entry[key] == expected_entry[key])
                     break
+
+@pytest.mark.parametrize(
+    'original_entries,filter_func,expected_entries',
+    [
+        (
+            single_entry,
+            None,
+            single_entry,
+        ),
+        (
+            single_entry,
+            lambda x: False,
+            [],
+        ),
+        (
+            multiple_entries,
+            lambda x: 'other' in x['title'],
+            [
+                {
+                    'title': 'Some other entry',
+                },
+            ],
+        ),
+    ],
+    ids=[
+        'Single entry - No filter',
+        'Single entry - Absolute filter',
+        'Multiple entry - Filter some entries',
+    ],
+)
+def test_feed_filter(original_entries, filter_func, expected_entries, monkeypatch):
+    def mocked_parse(url):
+        return MockFeed(
+            url,
+            entries=original_entries,
+        )
+    monkeypatch.setattr(feedparser, 'parse', mocked_parse)
+    feed = picot.feed.Feed('https://some.url', filter_func=filter_func)
+    assert(len(feed) == len(expected_entries))
+    assert(list(feed) == expected_entries)
