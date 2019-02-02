@@ -1,10 +1,11 @@
 import feedparser
 
 class Feed(object):
-    def __init__(self, url, filter_func=None):
+    def __init__(self, url, filter_func=None, format_func=None):
         if filter_func is None:
             filter_func = lambda x: True
         self.filter_func = filter_func
+        self.format_func = format_func
         self._feed = feedparser.parse(url)
         self._entries = None
 
@@ -21,7 +22,9 @@ class Feed(object):
         return len(self._entries)
 
     def __repr__(self):
-        return "{} ({})".format(
-            self._feed.feed.title,
-            self._feed.feed.link
-        )
+        if self.format_func is None:
+            return "{} ({})".format(
+                self._feed.feed.title,
+                self._feed.feed.link
+            )
+        return '\n'.join([self.format_func(entry) for entry in list(self)])
