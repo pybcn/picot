@@ -1,9 +1,14 @@
 import feedparser
 
+
+def _ok_to_all_filter(x):
+    return True
+
+
 class Feed(object):
     def __init__(self, url, filter_func=None, format_func=None):
         if filter_func is None:
-            filter_func = lambda x: True
+            filter_func = _ok_to_all_filter
         self.filter_func = filter_func
         self.format_func = format_func
         self._feed = feedparser.parse(url)
@@ -11,7 +16,8 @@ class Feed(object):
 
     def _update_entries(self):
         if self._entries is None:
-            self._entries = [entry for entry in self._feed.entries if self.filter_func(entry)]
+            self._entries = [entry for entry in self._feed.entries if
+                             self.filter_func(entry)]
 
     def __iter__(self):
         self._update_entries()

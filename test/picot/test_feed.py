@@ -4,10 +4,12 @@ import feedparser
 
 import picot.feed
 
+
 class MockFeedProperty(object):
     entries = []
     link = ''
     title = ''
+
 
 class MockFeed(object):
     def __init__(self, url, entries=None):
@@ -17,6 +19,7 @@ class MockFeed(object):
         self.feed = MockFeedProperty()
         self.feed.link = url
         self.feed.title = 'Feed at {}'.format(url)
+
 
 single_entry = [
     {
@@ -31,6 +34,7 @@ multiple_entries = [
         'title': 'Some other entry',
     },
 ]
+
 
 @pytest.mark.parametrize(
     'expected_entries',
@@ -63,6 +67,7 @@ def test_feed(expected_entries, monkeypatch):
                     assert(entry[key] == expected_entry[key])
                     break
 
+
 @pytest.mark.parametrize(
     'original_entries,filter_func,expected_entries',
     [
@@ -92,7 +97,12 @@ def test_feed(expected_entries, monkeypatch):
         'Multiple entry - Filter some entries',
     ],
 )
-def test_feed_filter(original_entries, filter_func, expected_entries, monkeypatch):
+def test_feed_filter(
+        original_entries,
+        filter_func,
+        expected_entries,
+        monkeypatch,
+):
     def mocked_parse(url):
         return MockFeed(
             url,
@@ -102,6 +112,7 @@ def test_feed_filter(original_entries, filter_func, expected_entries, monkeypatc
     feed = picot.feed.Feed('https://some.url', filter_func=filter_func)
     assert(len(feed) == len(expected_entries))
     assert(list(feed) == expected_entries)
+
 
 @pytest.mark.parametrize(
     'original_entries,format_func,expected_output',
@@ -146,7 +157,12 @@ def test_feed_filter(original_entries, filter_func, expected_entries, monkeypatc
         'Multiple entry - Simple format',
     ],
 )
-def test_feed_format(original_entries, format_func, expected_output, monkeypatch):
+def test_feed_format(
+        original_entries,
+        format_func,
+        expected_output,
+        monkeypatch,
+):
     def mocked_parse(url):
         return MockFeed(
             url,
