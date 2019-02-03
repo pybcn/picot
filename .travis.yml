@@ -5,7 +5,9 @@ python:
 sudo: false
 install:
   - pip install pipenv
-  - pipenv install
+  - pipenv install --dev
   - echo 'export PYTHONPATH=${PYTHONPATH}:.' > .env
 script:
-  - pipenv run pytest
+  - pipenv run pycodestyle .
+  - pipenv run flake8
+  - pipenv run pytest -v .
