@@ -1,5 +1,7 @@
 import feedparser
 
+from picot.entry import Entry
+
 
 def _ok_to_all_filter(x):
     """This is the default filter function."""
@@ -40,7 +42,8 @@ class Feed(object):
         function.
         """
         if self._entries is None:
-            self._entries = [entry for entry in self._feed.entries if
+            self._entries = [Entry(entry, format_func=self.format_func)
+                             for entry in self._feed.entries if
                              self.filter_func(entry)]
 
     def __iter__(self):
@@ -57,11 +60,8 @@ class Feed(object):
         return len(self._entries)
 
     def __repr__(self):
-        """This generates a representation of the feed, according to
-        the format function."""
-        if self.format_func is None:
-            return "{} ({})".format(
-                self._feed.feed.title,
-                self._feed.feed.link
-            )
-        return '\n'.join([self.format_func(entry) for entry in list(self)])
+        """This generates a representation of the feed."""
+        return "{} ({})".format(
+            self._feed.feed.title,
+            self._feed.feed.link
+        )
